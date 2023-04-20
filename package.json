@@ -1,0 +1,24 @@
+{
+  "name": "finp-service",
+  "version": "1.0.0",
+  "description": "Finp API.",
+  "author": "Maurício Romagnollo",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [],
+  "scripts": {
+    "start": "node src/main/index.js",
+    "dev": "node --watch src/main/index.js",
+    "lint": "eslint \"{src,test}/**/*.{ts,js,tsx,jsx}\"",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "dependencies": {
+    "cors": "2.8.5",
+    "express": "4.18.2",
+    "pino": "8.11.0"
+  },
+  "devDependencies": {
+    "@mauricioromagnollo/eslint-config": "2.2.2",
+    "eslint": "8.38.0"
+  }
+}
