@@ -10,7 +10,14 @@
     "start": "node src/main/index.js",
     "dev": "node --watch src/main/index.js",
     "lint": "eslint \"{src,test}/**/*.{ts,js,tsx,jsx}\"",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests --noStackTrace --runInBand",
+    "test:unit": "npm test -- -c jest.config.unit.js",
+    "test:watch": "npm run test:unit -- --watch",
+    "test:integration": "npm test -- -c jest.config.integration.js",
+    "test:e2e": "npm test -- -c jest.config.e2e.js",
+    "test:staged": "npm test -- --findRelatedTests --silent",
+    "test:ci": "npm test -- --coverage"
   },
   "dependencies": {
     "cors": "2.8.5",
@@ -19,6 +26,8 @@
   },
   "devDependencies": {
     "@mauricioromagnollo/eslint-config": "2.2.2",
-    "eslint": "8.38.0"
+    "eslint": "8.38.0",
+    "jest": "29.5.0",
+    "sinon": "15.0.4"
   }
 }
