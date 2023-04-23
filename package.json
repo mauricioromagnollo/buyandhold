@@ -9,10 +9,10 @@
   "scripts": {
     "prepare": "husky install",
     "start": "node src/main/index.js",
-    "dev": "node --watch src/main/index.js",
+    "dev": ". ./.env.dev; node --watch src/main/index.js",
     "lint": "eslint \"{src,test}/**/*.{ts,js,tsx,jsx}\"",
     "lint:fix": "npm run lint -- --fix",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests --noStackTrace --runInBand",
+    "test": ". ./.env.test; NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests --noStackTrace --runInBand",
     "test:unit": "npm test -- -c jest.config.unit.js",
     "test:watch": "npm run test:unit -- --watch",
     "test:integration": "npm test -- -c jest.config.integration.js",
