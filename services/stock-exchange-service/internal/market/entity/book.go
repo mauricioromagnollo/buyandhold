@@ -49,17 +49,26 @@ func (book *Book) AddTransaction(transaction *Transaction, waitGroup *sync.WaitG
 }
 
 func (book *Book) Trade() {
-	buyOrders := NewOrderQueue()
-	sellOrders := NewOrderQueue()
-
-	heap.Init(buyOrders)
-	heap.Init(sellOrders)
+	buyOrders := make(map[string]*OrderQueue)
+	sellOrders := make(map[string]*OrderQueue)
 
 	for order := range book.OrdersChan {
+		asset := order.Asset.ID
+
+		if buyOrders[asset] == nil {
+			buyOrders[asset] = NewOrderQueue()
+			heap.Init(buyOrders[asset])
+		}
+
+		if sellOrders[asset] == nil {
+			sellOrders[asset] = NewOrderQueue()
+			heap.Init(sellOrders[asset])
+		}
+
 		if order.OrderType == "BUY" {
-			buyOrders.Push(order)
-			if sellOrders.Len() > 0 && sellOrders.Orders[0].Price <= order.Price {
-				sellOrder := sellOrders.Pop().(*Order)
+			buyOrders[asset].Push(order)
+			if sellOrders[asset].Len() > 0 && sellOrders[asset].Orders[0].Price <= order.Price {
+				sellOrder := sellOrders[asset].Pop().(*Order)
 				if sellOrder.HasPendingShares() {
 					transaction := NewTransaction(sellOrder, order, order.Shares, sellOrder.Price)
 					book.AddTransaction(transaction, book.WaitGroup)
@@ -68,14 +77,14 @@ func (book *Book) Trade() {
 					book.OrdersChanOut <- sellOrder
 					book.OrdersChanOut <- order
 					if sellOrder.HasPendingShares() {
-						sellOrders.Push(sellOrder)
+						sellOrders[asset].Push(sellOrder)
 					}
 				}
 			}
 		} else if order.OrderType == "SELL" {
-			sellOrders.Push(order)
-			if buyOrders.Len() > 0 && buyOrders.Orders[0].Price >= order.Price {
-				buyOrder := buyOrders.Pop().(*Order)
+			sellOrders[asset].Push(order)
+			if buyOrders[asset].Len() > 0 && buyOrders[asset].Orders[0].Price >= order.Price {
+				buyOrder := buyOrders[asset].Pop().(*Order)
 				if buyOrder.HasPendingShares() {
 					transaction := NewTransaction(order, buyOrder, order.Shares, buyOrder.Price)
 					book.AddTransaction(transaction, book.WaitGroup)
@@ -84,7 +93,7 @@ func (book *Book) Trade() {
 					book.OrdersChanOut <- buyOrder
 					book.OrdersChanOut <- order
 					if buyOrder.HasPendingShares() {
-						buyOrders.Push(buyOrder)
+						buyOrders[asset].Push(buyOrder)
 					}
 				}
 			}
