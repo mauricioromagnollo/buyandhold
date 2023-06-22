@@ -15,6 +15,7 @@ coverage
 node_modules
 dist
 build
+mongodb_data
 
 # Logs
 logs
