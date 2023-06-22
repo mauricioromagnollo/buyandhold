@@ -1,27 +1,41 @@
 version: '3'
 
 services:
-  app:
+  home-broker-service:
     build: .
     container_name: home-broker-service
+    command: npm run dev
     ports:
-      - 3000:3000
+      - ${SERVER_PORT}:${SERVER_PORT}
+      - ${PRISMA_STUDIO_PORT}:${PRISMA_STUDIO_PORT}
     volumes:
       - .:/home/node/app
-  db:
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:${SERVER_PORT}/status"]
+      interval: 10s
+      retries: 5
+    depends_on:
+      - mongo-database
+
+  mongo-database:
     image: bitnami/mongodb:5.0.17
     volumes:
       - mongodb_data:/bitnami/mongodb
     environment:
-      MONGODB_ROOT_PASSWORD: root
-      MONGODB_REPLICA_SET_MODE: primary
-      MONGODB_REPLICA_SET_KEY: 123456
-      MONGODB_DATABASE: nest
+      MONGODB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      MONGODB_REPLICA_SET_MODE: ${MONGO_REPLICA_SET_MODE}
+      MONGODB_REPLICA_SET_KEY: ${MONGODB_REPLICA_SET_KEY}
+      MONGODB_DATABASE: ${DATABASE_NAME}
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   mongodb_data:
     driver: local
-
-networks:
-  my-network:
-    external: true

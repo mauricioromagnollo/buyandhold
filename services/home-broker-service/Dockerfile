@@ -1,7 +1,17 @@
-FROM node:18.16.0-slim
+FROM node:18-slim
+
+RUN apt update && apt install -yqq procps libssl-dev
 
 WORKDIR /home/node/app
 
-USER node
+COPY . .
 
-CMD ["tail", "-f", "/dev/null"]
+RUN npm ci
+
+RUN npx prisma generate
+
+ENV PORT 3333
+
+EXPOSE ${PORT}
+
+CMD [ "npm", "run", "dev" ]

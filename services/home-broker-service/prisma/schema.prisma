@@ -1,0 +1,20 @@
+generator client {
+  provider        = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+  previewFeatures = ["extendedWhereUnique"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Asset {
+  id          String    @id @map("_id")
+  symbol      String
+  price       Float
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+}
+
+
